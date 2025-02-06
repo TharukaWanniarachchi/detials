@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunset Escape - Customer Entry</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            text-align: center;
+            padding: 40px 0;
+        }
+        h2 {
+            color: navy; /* Navy blue for heading */
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        form {
+            background: #ffffff;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        form label {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-align: left;
+            display: block;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+        button {
+            background-color: navy; /* Navy blue for buttons */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #000080; /* Darker navy on hover */
+        }
+        table {
+            width: 90%;
+            margin-top: 40px;
+            border-collapse: collapse;
+            margin: 20px auto;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+        th {
+            background-color: navy; /* Navy blue for table headers */
+            color: white;
+        }
+        td a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        td a:hover {
+            text-decoration: underline;
+        }
+        .alert {
+            background-color: navy; /* Navy blue for alerts */
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Sunset Escape - Customer Entry</h2>
+
+    <div class="alert" id="successAlert">Entry Submitted Successfully!</div>
+
+    <form id="customerForm">
+        <label>Guest Name:</label>
+        <input type="text" id="guestName" required>
+        <label>Guest Address:</label>
+        <input type="text" id="guestAddress" required>
+        <label>Phone Number:</label>
+        <input type="tel" id="guestPhone" required>
+        <label>NIC Number:</label>
+        <input type="text" id="guestNIC" required>
+        <label>NIC Photo:</label>
+        <input type="file" id="nicPhoto" accept="image/*" required>
+        <label>Guest Count:</label>
+        <input type="number" id="guestCount" required>
+        <label>Event Date:</label>
+        <input type="date" id="eventDate" required>
+        <label>Purpose of Event:</label>
+        <select id="eventPurpose">
+            <option value="Day Out">Day Out</option>
+            <option value="Night Out">Night Out</option>
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+
+    <h3>Submitted Entries</h3>
+    <table id="dataTable">
+        <tr>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Phone</th>
+            <th>NIC</th>
+            <th>Guest Count</th>
+            <th>Event Date</th>
+            <th>Purpose</th>
+        </tr>
+    </table>
+
+    <script>
+        document.getElementById("customerForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            let formData = new FormData(this);
+
+            try {
+                const response = await fetch("https://script.google.com/macros/s/AKfycbzRkNabStQ-9xz4-snRQ8sABWRwNuLehiXXUq4cqZ14KTtlsFHWPj35iPC_LIRLFC8W/exec", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (response.ok) {
+                    document.getElementById("successAlert").style.display = "block";
+                    setTimeout(function() {
+                        document.getElementById("successAlert").style.display = "none";
+                    }, 3000);
+                    loadData();
+                } else {
+                    throw new Error('Failed to send data');
+                }
+            } catch (error) {
+                alert("An error occurred: " + error.message);
+            }
+        });
+
+        async function loadData() {
+            let response = await fetch("https://script.google.com/macros/s/AKfycbzRkNabStQ-9xz4-snRQ8sABWRwNuLehiXXUq4cqZ14KTtlsFHWPj35iPC_LIRLFC8W/exec");
+            let data = await response.json();
+            let table = document.getElementById("dataTable");
+            table.innerHTML = `<tr>
+                <th>Name</th><th>Address</th><th>Phone</th><th>NIC</th>
+                <th>Guest Count</th><th>Event Date</th><th>Purpose</th>
+            </tr>`;
+            data.forEach(row => {
+                let newRow = table.insertRow();
+                row.forEach(cell => {
+                    let newCell = newRow.insertCell();
+                    if (cell.startsWith("http")) {
+                        newCell.innerHTML = `<a href="${cell}" target="_blank">View</a>`;
+                    } else {
+                        newCell.innerText = cell;
+                    }
+                });
+            });
+        }
+
+        window.onload = loadData;
+    </script>
+
+</body>
+</html>
